@@ -1,3 +1,4 @@
+using BFF.Configuration;
 using BFF.Models;
 using Paramore.Brighter;
 using Paramore.Brighter.Extensions.DependencyInjection;
@@ -6,7 +7,8 @@ using Paramore.Brighter.ServiceActivator.Extensions.DependencyInjection;
 using Paramore.Brighter.Transforms.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Configuration.AddEnvironmentVariables();
+var brokerSettings = builder.Configuration.GetRequiredSection(BrokerSettingsOptions.BrokerSettings).Get<BrokerSettingsOptions>();
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -17,7 +19,7 @@ builder.Services.AddSwaggerGen();
 var kafkaGatewayConfig = new KafkaMessagingGatewayConfiguration()
 {
     Name = "eda.chatapp",
-    BootStrapServers = new[] { "localhost:9092" }
+    BootStrapServers = new[] { $"{brokerSettings!.Host}:{brokerSettings.Port}" }
 };
 
 // Brighter configuration: 
@@ -61,6 +63,7 @@ builder.Services.AddSingleton<IAmAStorageProviderAsync, InMemoryStorageProviderA
 builder.Services.AddSingleton<MessageModel>();
 
 var app = builder.Build();
+app.Logger.LogInformation($"Kafka target is {brokerSettings.Host}:{brokerSettings.Port}");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

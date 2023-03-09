@@ -1,4 +1,4 @@
 # ChatApp
 A super basic chat app
 
-Built to experiment with Event Driven architectures, Brighter, and Kafka
+Built to experiment with Event Driven architectures, Brighter, Kafka, and GraphQL

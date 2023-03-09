@@ -12,7 +12,6 @@ public class ChatMessageHandler : RequestHandler<ChatMessageSent>
     {
         _model = model;
     }
-
     public override ChatMessageSent Handle(ChatMessageSent command)
     {
         _model.Save( command.messageToSend );

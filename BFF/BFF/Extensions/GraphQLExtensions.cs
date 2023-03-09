@@ -26,7 +26,7 @@ public static class GraphQLExtensions
 
 public class ChatMessageQuery 
 {
-    public ChatMessage GetChatMessage() => new ChatMessage("Example", "example");
+    public ChatMessage GetLatestChatMessage([Service]MessageModel model) => model.Get().LastOrDefault() ?? new ChatMessage(string.Empty, string.Empty);
 }
 
 public class ChatMessageSubscription

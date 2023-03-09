@@ -1,10 +1,6 @@
 using BFF.Configuration;
-using BFF.Models;
-using Paramore.Brighter;
-using Paramore.Brighter.Extensions.DependencyInjection;
+using BFF.Extensions;
 using Paramore.Brighter.MessagingGateway.Kafka;
-using Paramore.Brighter.ServiceActivator.Extensions.DependencyInjection;
-using Paramore.Brighter.Transforms.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
@@ -22,45 +18,9 @@ var kafkaGatewayConfig = new KafkaMessagingGatewayConfiguration()
     BootStrapServers = new[] { $"{brokerSettings!.Host}:{brokerSettings.Port}" }
 };
 
-// Brighter configuration: 
-// https://brightercommand.gitbook.io/paramore-brighter-documentation/brighter-configuration/brighterbasicconfiguration
-builder.Services
-    .AddBrighter(
-        options => {
-            options.RequestContextFactory = new InMemoryRequestContextFactory();
-            options.HandlerLifetime = ServiceLifetime.Scoped;
-            options.CommandProcessorLifetime = ServiceLifetime.Scoped;
-            options.MapperLifetime = ServiceLifetime.Singleton;
-        }
-    )
-    .AutoFromAssemblies()
-    .UseExternalBus(
-        new KafkaProducerRegistryFactory(
-            kafkaGatewayConfig,
-            new KafkaPublication[] { new KafkaPublication() 
-            {
-                Topic = new RoutingKey("ChatMessages"),
-                MakeChannels = OnMissingChannel.Create,
-                TransactionalId = Guid.NewGuid().ToString()
-            }
-            }
-        ).Create()
-    );
+builder.Services.AddBrighter( kafkaGatewayConfig );
 
-builder.Services.AddServiceActivator( options => {
-    options.Subscriptions = new KafkaSubscription[] 
-    {
-        new KafkaSubscription<BFF.Controllers.ChatMessageSent>(
-            name: new SubscriptionName("eda.chatapp"),
-            channelName: new ChannelName("ChatMessages"),
-            routingKey: new RoutingKey("ChatMessages")
-        )
-    };
-    options.ChannelFactory = new ChannelFactory( new KafkaMessageConsumerFactory( kafkaGatewayConfig ));
-}).AutoFromAssemblies();
-
-builder.Services.AddSingleton<IAmAStorageProviderAsync, InMemoryStorageProviderAsync>();
-builder.Services.AddSingleton<MessageModel>();
+builder.Services.AddGraphQL();
 
 var app = builder.Build();
 app.Logger.LogInformation($"Kafka target is {brokerSettings.Host}:{brokerSettings.Port}");
@@ -79,5 +39,7 @@ else {
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.ConfigureGraphQL();
 
 app.Run();

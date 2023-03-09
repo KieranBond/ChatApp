@@ -39,4 +39,4 @@ public record class ChatMessageSent(ChatMessage messageToSend) : IEvent {
     public Guid Id { get; set; } = Guid.NewGuid();
 }
 
-public record struct ChatMessage(string SenderUsername, string Message) {}
+public record class ChatMessage(string SenderUsername, string Message) {}

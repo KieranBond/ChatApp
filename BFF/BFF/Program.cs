@@ -3,7 +3,12 @@ using BFF.Extensions;
 using Paramore.Brighter.MessagingGateway.Kafka;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddEnvironmentVariables();
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true) //load base settings
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true) //load environment settings    
+    .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true) //load local settings
+    .AddEnvironmentVariables();
+
 var brokerSettings = builder.Configuration.GetRequiredSection(BrokerSettingsOptions.BrokerSettings).Get<BrokerSettingsOptions>();
 // Add services to the container.
 

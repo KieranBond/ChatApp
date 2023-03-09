@@ -3,16 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-# FIX specific
-/[Ss]tore/*
-/uk-trading-fix-example/store/*
-/uk-trading-fix-example/uk-trading-fix-example-acceptor-logs/*
-/Fix/Logs
-/Fix/Store/*.session
-/Fix/Store/*.seqnums
-/Fix/Store/*.header
-/Fix/Store/*.body
-
 # User-specific files
 *.rsuser
 *.suo
@@ -22,6 +12,7 @@
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
+appsettings.local.json
 
 # Mono auto generated files
 mono_crash.*

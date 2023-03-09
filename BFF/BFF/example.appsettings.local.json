@@ -1,0 +1,12 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "BrokerSettings": {
+    "Host": "localhost",
+    "Port": 9092
+  }
+}
